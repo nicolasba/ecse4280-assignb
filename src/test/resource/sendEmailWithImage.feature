@@ -5,11 +5,14 @@ Feature: Send an email with an image attachment
 #
 #    Given I am logged into my email account
 #    And I enter my friend's "<email>"
-#    And I attach an "<image>" from my computer
+#    And I attach an "<image>" from the cloud
 #    When I send the email
 #    Then I should receive a successful confirmation
 #
 #    Examples:
+#      |                email                |     image        |
+#      | jose.barreyrolopez@mail.mcgill.ca   |   confused.jpg   |
+##      | nicobarreyro@hotmail.com            |   confused.jpg   |
 #      |                email                |     image        |
 #      | jose.barreyrolopez@mail.mcgill.ca   |   confused.jpg   |
 ##      | nicobarreyro@hotmail.com            |   confused.jpg   |
@@ -27,8 +30,7 @@ Feature: Send an email with an image attachment
 #      | jose.barreyrolopez@mail.mcgill.ca   |     confused.jpg       |
       | nicobarreyro@hotmail.com            |     shaking_toad.gif       |
 
-#
-#  Scenario Outline: Error Email sent with an image attachment (Error flow)
+#  Scenario Outline:  Email sent with an image that is on the Google Drive (Alternate flow)
 #
 #    Given I am logged into my email account
 #    And I enter my friend's "<email>"
@@ -36,6 +38,19 @@ Feature: Send an email with an image attachment
 #    When I send the email
 #    Then I should receive a successful confirmation
 #
+#    Examples:
+#      |                email                |      image       |
+##      | jose.barreyrolopez@mail.mcgill.ca   |     confused.jpg       |
+#      | nicobarreyro@hotmail.com            |     confused.jpg       |
+
+
+#  Scenario Outline: Error Email sent with an image attachment (Error flow)
+#
+#    Given I am logged into my email account
+#    And I attach an "<image>"
+#    When I send the email
+#    Then I should receive an error message
+##
 #    Examples:
 #      |                email                |     image      |
 #      | jose.barreyrolopez@mail.mcgill.ca   |   asdada   |

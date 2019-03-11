@@ -14,6 +14,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.awt.event.InputEvent;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -25,19 +26,26 @@ public class StepDefs {
 
     private WebDriver driver;
     private WebDriverWait wait;
-    private String driverPath = "drivers/geckodriver.exe";
+    private String driverPathWindows = "drivers/geckodriver.exe";
+    private String driverPathMac = "drivers/geckodriver";
     private String url = "https://login.live.com/login.srf?wa=wsignin1.0&rpsnv=13&ct=1552266948&rver=7.0.6737.0&wp=MBI_SSL&wreply=https%3a%2f%2foutlook.live.com%2fowa%2f%3fnlp%3d1%26RpsCsrfState%3d4db93362-4c78-4700-88b1-96478e6208c0&id=292841&aadredir=1&CBCXT=out&lw=1&fl=dob%2cflname%2cwld&cobrandid=90015";
     private String dummyUsername = "tempUserEcse428@outlook.com";
     private String dummyPassword = "passwordecse428";
     private String dummySubject = "Sending funny image :) :)";
     private String inboxWindow;
     private String attachFileWindow;
+    private static String OS = System.getProperty("os.name").toLowerCase();
 
     @Before
     public void setUp() {
 
         //Sets up Firefox driver and logs in using dummy credentials
-        System.setProperty("webdriver.gecko.driver", driverPath);
+        //Sets up Firefox driver and logs in using dummy credentials
+        if(OS.contains("win")) {
+            System.setProperty("webdriver.gecko.driver", driverPathWindows);
+        } else if (OS.contains("mac")) {
+            System.setProperty("webdriver.gecko.driver", driverPathMac);
+        }
         driver = new FirefoxDriver();
         wait = new WebDriverWait(driver, 30);
 
@@ -110,20 +118,68 @@ public class StepDefs {
         StringSelection selection = new StringSelection(imagePath);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();    //Copy image path to clipboard
         clipboard.setContents(selection, selection);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
         //Paste from clipboard to input textfield
-        robot.keyPress(KeyEvent.VK_CONTROL);
-        robot.delay(100);
-        robot.keyPress(KeyEvent.VK_V);
-        robot.delay(100);
-        robot.keyRelease(KeyEvent.VK_V);
-        robot.delay(100);
-        robot.keyRelease(KeyEvent.VK_CONTROL);
-        robot.delay(200);
-        robot.keyPress(KeyEvent.VK_ENTER);
-        robot.delay(200);
-        robot.keyRelease(KeyEvent.VK_ENTER);
-        robot.delay(200);
+        if(OS.contains("win")) {
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.delay(100);
+            robot.keyPress(KeyEvent.VK_V);
+            robot.delay(100);
+            robot.keyRelease(KeyEvent.VK_V);
+            robot.delay(100);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            robot.delay(200);
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.delay(200);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+            robot.delay(200);
+        } else if (OS.contains("mac")) {
+
+            robot.mouseMove((int)screenSize.getWidth()/2,(int)screenSize.getHeight()/2);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            robot.delay(200);
+
+//            robot.delay(5000);
+            robot.keyPress(KeyEvent.VK_META);
+            //robot.delay(100);
+            robot.keyPress(KeyEvent.VK_SHIFT);
+            //robot.delay(100);
+            robot.keyPress(KeyEvent.VK_G);
+            //robot.delay(100);
+            robot.keyRelease(KeyEvent.VK_G);
+            // robot.delay(200);
+            robot.keyRelease(KeyEvent.VK_META);
+            //robot.delay(100);
+            robot.keyRelease(KeyEvent.VK_SHIFT);
+
+
+
+            robot.keyPress(KeyEvent.VK_META);
+            //robot.delay(100);
+            robot.keyPress(KeyEvent.VK_V);
+            //robot.delay(100);
+            robot.keyRelease(KeyEvent.VK_V);
+//            robot.delay(100);
+            robot.keyRelease(KeyEvent.VK_META);
+            robot.delay(100);
+
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+            robot.delay(500);
+
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+            robot.delay(500);
+
+            robot.keyPress(KeyEvent.VK_META);
+            robot.keyPress(KeyEvent.VK_DOWN);
+            robot.keyRelease(KeyEvent.VK_META);
+            robot.keyRelease(KeyEvent.VK_DOWN);
+            robot.delay(3000);
+        }
+
     }
 
     @And("^I attach an \"([^\"]*)\" from the cloud$")
@@ -180,9 +236,27 @@ public class StepDefs {
 
     @Then("^I should receive a successful confirmation$")
     public void iShouldReceiveASuccessfulConfirmation() {
+    WebElement sentEmails = driver.findElement(By.cssSelector("div:nth-child(2) > div:nth-child(2) > .\\_34_bqC0c1-8H3B0lGzop-9:nth-child(1) > .\\_2qZaU4w9P1XG8-zs5arlR3"));
+       sentEmails.click(); //open sent emails
 
+       driver.findElement(By.cssSelector("#AQAAAAAAAQABAAAAAET5MwAAAAA\\= .RKJYnFQ991LYsw_styUw > span")).click(); //open first email
+
+       driver.findElement(By.cssSelector("\\_1GbKnlrcyAfdgFr9WpTgdU")).click(); //open name who its sent to
+
+       driver.findElement(By.cssSelector(".icon-440")).click(); //copy their name
+
+        WebElement subject = driver.findElement(By.cssSelector(".dJ4kO5HcLAM4x-GXmxP8n"));
+
+        Assert.assertEquals(subject.getText(), dummySubject);
+
+        //Assert.assertTrue(driver.findElement(By.cssSelector(".icon-440")).click(),);
         //Gmail
 //        Assert.assertTrue(wait.until(ExpectedConditions.textToBe(By.className("bAq"), "Message sent.")));
+    }
+
+    @Then("^I should receive an error message$")
+    public void iShouldReceiveAnError() {
+        Assert.assertTrue(wait.until(ExpectedConditions.textToBe(By.cssSelector(".\\_2eDT5LAxGsFuAUVDuX3mz_ > span"), "This message must have at least one recipient.")));
     }
 
     @After
