@@ -1,5 +1,6 @@
 package ca.mcgill.ecse428;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.Before;
 import cucumber.api.java.After;
 import cucumber.api.java.en.And;
@@ -35,14 +36,14 @@ public class StepDefs {
     private Robot robot;
 
     //Dummy data
-    private String dummyUsername = "A428test@outlook.com";
-    private String dummyPassword = "428assignment";
-    private String dummySubject = "Sending funny image :) :)";
+    private String dummyUsername = "E428Test@outlook.com";
+    private String dummyPassword = "passwordecse428";
+    private String dummySubject = "Hey, take a look at this picture";
 
     private String recipientEmail;
 
     @Before
-    public void setUp() {
+    public void setUp(){
 
         //Sets up Firefox driver and logs in using dummy credentials
         System.setProperty("webdriver.gecko.driver", driverPath);
@@ -77,15 +78,15 @@ public class StepDefs {
     }
 
     @Given("^I am logged into my email account$")
-    public void iAmLoggedIntoMyEmailAccount() {
+    public void iAmLoggedIntoMyEmailAccount(){
 
         //Click on "New message"
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".\\_1Tegvg68M2d-4Z3rDrt2B3")));
         driver.findElement(By.cssSelector(".\\_1Tegvg68M2d-4Z3rDrt2B3")).click();
     }
 
-    @And("^I enter my friend's \"([^\"]*)\"$")
-    public void iEnterMyFriendS(String email){
+    @And("^I enter the recipient's \"([^\"]*)\"$")
+    public void iEnterTheRecipientS(String email){
 
         //Enter recipient email
         recipientEmail = email;
@@ -130,7 +131,7 @@ public class StepDefs {
     }
 
     @And("^I attach an \"([^\"]*)\" from the cloud$")
-    public void iAttachAnFromTheCloud(String image) throws Throwable {
+    public void iAttachAnFromTheCloud(String image){
 
         //Click on "Attach"
         wait.until(ExpectedConditions.elementToBeClickable(By.name("Attach")));
@@ -140,8 +141,8 @@ public class StepDefs {
         wait.until(ExpectedConditions.elementToBeClickable(By.name("Browse cloud locations")));
         driver.findElement(By.name("Browse cloud locations")).click();
 
-        Thread.sleep(2000);
         //Selects image in OneDrive that corresponds to the image name
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[starts-with(@class, '_2T9I4P_0kdYxjcQ-T-Fuie')]")));
         List<WebElement> cloudImagesList = driver.findElements(By.xpath("//*[starts-with(@class, '_2T9I4P_0kdYxjcQ-T-Fuie')]"));
         for (WebElement e: cloudImagesList){
             if (e.getAttribute("title").equals(image))
@@ -159,14 +160,14 @@ public class StepDefs {
         //Enter a dummy subject and Click on "Send"
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ms-Button--primary")));
         driver.findElement(By.id("subjectLine0")).sendKeys(dummySubject);
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         driver.findElement(By.cssSelector(".ms-Button--primary")).click();
     }
 
     //Will return true if expectedEmail = actualEmail and expectSubject = actualSubject
-    public boolean testSubjectAndEmail () throws Exception{
+    private boolean testSubjectAndEmail () throws Exception{
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         //Click on "Sent Items"
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div:nth-child(2) > div:nt" +
                 "h-child(2) > .\\_34_bqC0c1-8H3B0lGzop-9:nth-child(1) > .\\_2qZaU4w9P1XG8-zs5arlR3")));
@@ -195,29 +196,31 @@ public class StepDefs {
         Assert.assertTrue(testSubjectAndEmail());
     }
 
-    public boolean isWarningPresent() throws Exception{
+    private boolean isWarningPresent(){
 
-        Thread.sleep(3000);
         //Get warning
-        wait.until(ExpectedConditions.elementToBeClickable(By.className("_2eDT5LAxGsFuAUVDuX3mz_ _3zUVDEaVDhyHmlV2" +
-                "830f9z F99zb1PyC88tXPxMniJJF")));
-        String warning = driver.findElement(By.className("_2eDT5LAxGsFuAUVDuX3mz_ _3zUVDEaVDhyHmlV2830f" +
-                "9z F99zb1PyC88tXPxMniJJF")).getText();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".\\_2eDT5LAxGsFuAUVDuX3mz_ > span")));
+        String warning = driver.findElement(By.cssSelector(".\\_2eDT5LAxGsFuAUVDuX3mz_ > span")).getText();
 
         return warning.equals("This message must have at least one recipient.");
     }
 
     @Then("^I should be warned that the email could not be sent$")
-    public void iShouldBeWarnedThatTheEmailCouldNotBeSent() throws Exception {
+    public void iShouldBeWarnedThatTheEmailCouldNotBeSent(){
 
         Assert.assertTrue(isWarningPresent());
     }
 
     @After
-    public void tearDown() {
+    public void tearDown(){
 
         //Sign out
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ZOugRDnXxgnHy1ncf7VTA:nth-child(5)")));
+        driver.findElement(By.cssSelector(".ZOugRDnXxgnHy1ncf7VTA:nth-child(5)")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li:nth-child(3) > .ms-Button")));
+        driver.findElement(By.cssSelector("li:nth-child(3) > .ms-Button")).click();
 
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("q")));  //Outlook homepage
 
         //Terminate Web driver
         driver.close();
