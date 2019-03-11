@@ -129,17 +129,30 @@ public class StepDefs {
     @And("^I attach an \"([^\"]*)\" from the cloud$")
     public void iAttachAnFromTheCloud(String image) throws Throwable {
 
-        WebElement attachImageDriveBtn = driver.findElement(By.id(":a0"));
-        wait.until(ExpectedConditions.elementToBeClickable(attachImageDriveBtn));
-        attachImageDriveBtn.click();
+        //Click on "Attach"
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("Attach")));
+        driver.findElement(By.name("Attach")).click();
+//        driver.findElement(By.id(":9u")).click();   //Click on "attach file" button
 
-        for (String s : driver.getWindowHandles())
-            System.out.println(s);
+        //Click on "Browse this computer"
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("Browse cloud locations")));
+        driver.findElement(By.name("Browse cloud locations")).click();
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[2]/div[3]/div/div/div")));
-        WebElement textInputBar = driver.findElement(By.xpath("//div[2]/div[3]/div/div/div"));
-        wait.until(ExpectedConditions.elementToBeClickable(textInputBar));
-        textInputBar.click();
+        Thread.sleep(2000);
+        //Selects image in OneDrive that corresponds to the image name
+        List<WebElement> cloudImagesList = driver.findElements(By.xpath("//*[starts-with(@class, '_2T9I4P_0kdYxjcQ-T-Fuie')]"));
+        for (WebElement e: cloudImagesList){
+            if (e.getAttribute("title").equals(image))
+                e.click();
+        }
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".\\_2IQpIn0UF3OF_CtC-Awq-- > .ms-Button")));
+        driver.findElement(By.cssSelector(".\\_2IQpIn0UF3OF_CtC-Awq-- > .ms-Button")).click();
+
+//        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[2]/div[3]/div/div/div")));
+//        WebElement textInputBar = driver.findElement(By.xpath("//div[2]/div[3]/div/div/div"));
+//        wait.until(ExpectedConditions.elementToBeClickable(textInputBar));
+//        textInputBar.click();
 
 //        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("fe-Rg-cb")));
 //        List<WebElement> imagesNames = driver.findElements(By.className("fe-Rg-cb"));
@@ -149,10 +162,10 @@ public class StepDefs {
 //                e.click();
 //        }
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='picker:ap:0']")));
-        WebElement insertBtn = driver.findElement(By.xpath("//div[@id='picker:ap:0']"));
-        wait.until(ExpectedConditions.elementToBeClickable(insertBtn));
-        insertBtn.click();
+//        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='picker:ap:0']")));
+//        WebElement insertBtn = driver.findElement(By.xpath("//div[@id='picker:ap:0']"));
+//        wait.until(ExpectedConditions.elementToBeClickable(insertBtn));
+//        insertBtn.click();
     }
 
     @When("^I send the email$")
